@@ -2,7 +2,12 @@
   "expo": {
     "name": "MaMeteo",
     "slug": "MaMeteo",
-    "version": "1.0.0"
+    "version": "1.0.0",
+    "extra": {
+      "eas": {
+        "projectId": "3c05235b-5be1-45c3-beda-2da9fe7f8b24"
+      }
+    }
   },
   "name": "MaMeteo"
 }
