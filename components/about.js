@@ -5,7 +5,14 @@ export default function About({ navigation }) {
 
     return (
 
-        <View style={style.view}>
+        <View
+            options={{
+                flex: 1,
+                alignItems: 'center',
+                flexDirection: "column",
+            }} >
+
+            <Text style={style.title}> A propos de Lou Meteo</Text>
 
             <Text style={style.paragraph}>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Molestias a velit natus illum temporibus, iure consequuntur. Hic blanditiis laboriosam officia nihil delectus assumenda cupiditate! Soluta ad eum molestiae. Nisi, ipsum.
             </Text>
@@ -14,8 +21,8 @@ export default function About({ navigation }) {
 
             {/* <ActivityIndicator style={style.view} color="blue" size="large" animating={true} /> */}
 
-            <Button onPress={() => navigation.navigate('Search')} title="Rechercher" color="firebrick" fontColor="lemonchiffon" />
-        </View>
+            <Button onPress={() => navigation.navigate('SearchScreen')} title="Rechercher" color="firebrick" fontColor="lemonchiffon" />
+        </View >
     )
 }
 const style = StyleSheet.create({
@@ -27,10 +34,10 @@ const style = StyleSheet.create({
         textAlign: "justify",
         margin: 30,
     },
-
     title: {
         fontSize: 22,
         marginBottom: 20,
-        fontWeight: "bold"
+        fontWeight: "bold",
+        textAlign: 'center'
     }
 })

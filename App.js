@@ -1,7 +1,7 @@
 
 import React from 'react';
 import About from './components/about';
-import Search from './components/search';
+import HomeView from './components/search';
 import { NavigationContainer } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { FontAwesome } from '@expo/vector-icons';
@@ -31,30 +31,30 @@ const App = () => {
             tabBarPosition: 'bottom',
             tabBarPressColor: 'firebrick ',
             tabBarShowIcon: true,
-
             tabBarItemStyle: { width: 100 }
           },
         }}
       >
         < Tab.Screen
-          name="Search"
-          component={Search}
+          name=" Lou Meteo"
+          component={HomeView}
           options={{
             tabBarIcon: ({ color, size }) => (
-              <Ionicons name="home" size={30} color="lemonchiffon" />
+              <Ionicons name="home" size={40} color="white" />
             ),
           }}
-
-
-
         />
+
         <Tab.Screen
-          name="A propos de l'application"
+          name="Lou Meteo"
           component={About}
           options={{
-
             tabBarIcon: ({ color, size }) => (
-              <FontAwesome name="user-circle-o" size={30} color="lemonchiffon" />
+              <FontAwesome
+                name="user-circle-o"
+                size={40}
+                color="white"
+              />
             ),
             tabBarLabelStyle: {
               tabBarShowLabel: 'false',
