@@ -1,7 +1,8 @@
 import * as  React from 'react';
-import { StyleSheet, TextInput, Button, Text } from 'react-native';
+import { StyleSheet, TextInput, Button, Text, View, FlatList, ListItem, ActivityIndicator } from 'react-native';
 import { createStackNavigator } from '@react-navigation/stack';
 import axios from 'axios';
+
 
 
 
@@ -40,35 +41,52 @@ const HomeView = () => {
     const ResultsScreen = ({ route, navigation }) => {
 
         const { city } = route.params;
-        const [weather, setWeather] = React.useState('');
+        const apiKey = '065226c21b8d826696463ac947f8b12c';
+
+        const [weatherData, setWeatherData] = React.useState([]);
 
         React.useEffect(() => {
-            //     const fetchWeather = async () => {
-            //         try {
-            //             // const response = await axios.get(`http://api.openweathermap.org/data/2.5/weather?q=${city}&appid=YOUR_API_KEY`);
-            //             setWeather(response.data);
-            //         } catch (error) {
-            //             console.error(error);
-            //         }
-            //     };
-            //     fetchWeather();
+            const fetchWeather = async () => {
+                try {
+
+                    const response = await axios.get(`https://api.openweathermap.org/data/2.5/forecast?q=${city}&cnt=7&appid=${apiKey}&units=metric`);
+
+                    const cityWeather = response.data.list;
+                    const iconWeather = [];
+
+                    setWeatherData(cityWeather);
+                } catch (error) {
+                    console.error(error);
+                }
+            };
+            fetchWeather();
         }, [city]);
 
+        if (!cityWeather) {
+            return (
+                <View style={styles.container}>
+                    <ActivityIndicator color={"firebrick"} size={"large"} />
+                </View>
+            );
+        };
+
         return (
-            <>
-                {weather.main ? (
-                    <View style={styles.container}>
-                        <Text>Meteo de {city}</Text>
-                        <Text>Temperature: {weather.main.temp}°C</Text>
-                        <Text>Humidite: {weather.main.humidity}%</Text>
-                        <Text>Condition meteo: {weather.weather[0].description}</Text>
+            <View>
+                {weatherData.map((day, index) => (
+                    <View key={index} style={styles.container}>
+                        <Text style={styles.day}>{day.dayOfWeek}</Text>
+                        <Image style={styles.icon}
+                            source={{ uri: `http://openweathermap.org/img/w/${day.weatherIcon}.png` }}
+
+                        />
+                        <Text style={styles.temperature}>{day.temperature}°C</Text>
                     </View>
-                ) : (
-                    <Text Style={styles.title} >En attente de chargement...</Text >
-                )}
-            </>
+                ))}
+            </View>
         )
+
     };
+
 
 
     const Stack = createStackNavigator();
@@ -129,6 +147,22 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         textAlign: 'center',
         marginTop: 60
+    },
+    weatherItem: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 10,
+    },
+    day: {
+        marginRight: 10,
+        fontSize: 18,
+    },
+    icon: {
+        width: 50,
+        height: 50,
+    },
+    temperature: {
+        fontSize: 18,
     },
 })
 
