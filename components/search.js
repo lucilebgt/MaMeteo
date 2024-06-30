@@ -1,5 +1,5 @@
 import * as  React from 'react';
-import { StyleSheet, TextInput, Button, Text, View, FlatList, Image, ActivityIndicator } from 'react-native';
+import { StyleSheet, TextInput, Button, Text, View, FlatList, Image, ActivityIndicator, FadeInView } from 'react-native';
 import { createStackNavigator } from '@react-navigation/stack';
 import axios from 'axios';
 
@@ -88,51 +88,49 @@ const HomeView = () => {
             return acc;
         }, []);
 
-        return (
+        return (<FadeInView>
             <View style={styles.container}>
                 <Text style={[styles.title, styles.cityName]}>Météo {city}</Text>
 
-                <FlatList
+                <FlatList>
                     style={styles.flatList}
                     data={weatherFound}
                     keyExtractor={(item, index) => index.toString()}
                     renderItem={({ item, index }) => (
+                        <>
+                            {
+                                index === '0' ? (
+                                    <View
+                                        style={styles.firstView}>
+                                        <View style={styles.firstView.column}>
+                                            <Image
+                                                source={{ uri: `http://openweathermap.org/img/w/${item.weatherIcon}.png` }}
+                                                style={styles.firstView.icon}
+                                            />
+                                            <Text style={styles.firstView.day}>{item.dayOfWeek}{item.currentDate}</Text>
 
-                        { index === 0) ?
-                        (
-                            <FadeInView>
-                                <View
-                                    style={styles.firstView}>
-                                    <View style={styles.firstView.column}>
-                                        <Image
-                                            source={{ uri: `http://openweathermap.org/img/w/${item.weatherIcon}.png` }}
-                                            style={styles.firstView.icon}
-                                        />
-                                        <Text style={styles.firstView.day}>{item.dayOfWeek}{item.currentDate}</Text>
-
-                                        <Text style={styles.firstView.temperature}>{item.temperature}°C</Text>
+                                            <Text style={styles.firstView.temperature}>{item.temperature}°C</Text>
+                                        </View>
                                     </View>
-                                </View>
-                            </FadeInView>
-                        ) : (
-                            <FadeInView>
-                                <View
-                                    style={styles.weatherItem}>
-                                    <View style={styles.weatherItem}>
-                                        <Image
-                                            source={{ uri: `http://openweathermap.org/img/w/${item.weatherIcon}.png` }}
-                                            style={styles.icon}
-                                        />
-                                        <Text style={styles.day}>{item.dayOfWeek}{item.currentDate}</Text>
+                                ) : (
+                                    < View
+                                        style={styles.weatherItem}>
+                                        <View style={styles.weatherItem}>
+                                            <Image
+                                                source={{ uri: `http://openweathermap.org/img/w/${item.weatherIcon}.png` }}
+                                                style={styles.icon}
+                                            />
+                                            <Text style={styles.day}>{item.dayOfWeek}{item.currentDate}</Text>
 
-                                        <Text style={styles.temperature}>{item.temperature}°C</Text>
+                                            <Text style={styles.temperature}>{item.temperature}°C</Text>
+                                        </View>
                                     </View>
-                                </View>
-                            </FadeInView>
-                        )
-                    }             
-    )} />
-            </View>
+                                )}
+                        </>
+                    )}
+                </FlatList>
+            </View >
+        </FadeInView >
         )
     };
 
