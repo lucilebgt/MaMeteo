@@ -1,5 +1,5 @@
 import * as  React from 'react';
-import { StyleSheet, TextInput, Button, Text, View, FlatList, ListItem, ActivityIndicator } from 'react-native';
+import { StyleSheet, TextInput, Button, Text, View, FlatList, Image, ActivityIndicator } from 'react-native';
 import { createStackNavigator } from '@react-navigation/stack';
 import axios from 'axios';
 
@@ -41,20 +41,20 @@ const HomeView = () => {
     const ResultsScreen = ({ route, navigation }) => {
 
         const { city } = route.params;
-        const apiKey = '065226c21b8d826696463ac947f8b12c';
 
-        const [weatherData, setWeatherData] = React.useState([]);
 
+        const [weatherData, setWeatherData] = React.useState(null);
+
+
+        //= Requête de météo à chaque changement de ville
         React.useEffect(() => {
+
             const fetchWeather = async () => {
                 try {
+                    const response = await axios.get(`http://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=065226c21b8d826696463ac947f8b12c`);
 
-                    const response = await axios.get(`https://api.openweathermap.org/data/2.5/forecast?q=${city}&cnt=7&appid=${apiKey}&units=metric`);
+                    setWeatherData(response.data);
 
-                    const cityWeather = response.data.list;
-                    const iconWeather = [];
-
-                    setWeatherData(cityWeather);
                 } catch (error) {
                     console.error(error);
                 }
@@ -62,29 +62,78 @@ const HomeView = () => {
             fetchWeather();
         }, [city]);
 
-        if (!cityWeather) {
+        //= Afficher un indicateur de chargement pendant la récupération des données météorologiques
+        if (!weatherData) {
             return (
                 <View style={styles.container}>
                     <ActivityIndicator color={"firebrick"} size={"large"} />
                 </View>
-            );
-        };
+            )
+        }
+
+        //= Processus de transformation des données météorologiques
+        const weatherFound = weatherData.list.reduce((acc, day) => {
+            const date = new Date(day.dt * 1000);
+            const dayOfWeek = date.toLocaleString('fr-FR', { weekday: 'short', day: 'numeric', month: 'numeric' });
+            const temperature = Math.floor(day.main.temp).toString().slice(0, 2);
+
+            //= Récupérer les deux premiers chiffres de la température
+            const weatherIcon = day.weather[0].icon;
+
+            //= Vérifier si le jour n'existe pas déjà dans acc avant de l'ajouter
+            if (!acc.find(item => item.dayOfWeek === dayOfWeek)) {
+                acc.push({ dayOfWeek, temperature, weatherIcon });
+            }
+
+            return acc;
+        }, []);
 
         return (
-            <View>
-                {weatherData.map((day, index) => (
-                    <View key={index} style={styles.container}>
-                        <Text style={styles.day}>{day.dayOfWeek}</Text>
-                        <Image style={styles.icon}
-                            source={{ uri: `http://openweathermap.org/img/w/${day.weatherIcon}.png` }}
+            <View style={styles.container}>
+                <Text style={[styles.title, styles.cityName]}>Météo {city}</Text>
 
-                        />
-                        <Text style={styles.temperature}>{day.temperature}°C</Text>
-                    </View>
-                ))}
+                <FlatList
+                    style={styles.flatList}
+                    data={weatherFound}
+                    keyExtractor={(item, index) => index.toString()}
+                    renderItem={({ item, index }) => (
+
+                        { index === 0) ?
+                        (
+                            <FadeInView>
+                                <View
+                                    style={styles.firstView}>
+                                    <View style={styles.firstView.column}>
+                                        <Image
+                                            source={{ uri: `http://openweathermap.org/img/w/${item.weatherIcon}.png` }}
+                                            style={styles.firstView.icon}
+                                        />
+                                        <Text style={styles.firstView.day}>{item.dayOfWeek}{item.currentDate}</Text>
+
+                                        <Text style={styles.firstView.temperature}>{item.temperature}°C</Text>
+                                    </View>
+                                </View>
+                            </FadeInView>
+                        ) : (
+                            <FadeInView>
+                                <View
+                                    style={styles.weatherItem}>
+                                    <View style={styles.weatherItem}>
+                                        <Image
+                                            source={{ uri: `http://openweathermap.org/img/w/${item.weatherIcon}.png` }}
+                                            style={styles.icon}
+                                        />
+                                        <Text style={styles.day}>{item.dayOfWeek}{item.currentDate}</Text>
+
+                                        <Text style={styles.temperature}>{item.temperature}°C</Text>
+                                    </View>
+                                </View>
+                            </FadeInView>
+                        )
+                    }             
+    )} />
             </View>
         )
-
     };
 
 
@@ -120,6 +169,7 @@ const HomeView = () => {
 
 
 }
+
 export default HomeView;
 
 const styles = StyleSheet.create({
@@ -150,20 +200,73 @@ const styles = StyleSheet.create({
     },
     weatherItem: {
         flexDirection: 'row',
+        width: '100%',
+        backgroundColor: 'firebrick',
+        borderBottomWidth: 1,
+        borderBlockColor: '#202340',
+        height: 60,
         alignItems: 'center',
-        marginBottom: 10,
+        justifyContent: 'space-between',
+        paddingHorizontal: 20,
+        paddingVertical: 10,
+    },
+    flatList: {
+        width: '100%',
     },
     day: {
         marginRight: 10,
-        fontSize: 18,
+        fontSize: 25,
+        alignItems: "center",
+        color: '#fff',
+        fontWeight: 'bold',
     },
     icon: {
-        width: 50,
-        height: 50,
+        width: 60,
+        height: 60,
+        alignItems: "flex-start",
     },
     temperature: {
-        fontSize: 18,
+        fontSize: 25,
+        alignItems: "flex-end",
+        color: '#fff',
+        fontWeight: 'bold',
     },
+    cityName: {
+        backgroundColor: 'lemonchiffon',
+        paddingHorizontal: '90',
+        paddingVertical: 4,
+    },
+    firstView: {
+
+        backgroundColor: '#e54b65',
+        paddingVertical: 80,
+
+        day: {
+
+            fontSize: 25,
+            alignItems: "flex-start",
+            color: '#fff',
+            fontWeight: 'bold',
+        },
+        icon: {
+            width: 95,
+            alignItems: "flex-start",
+        },
+        temperature: {
+            fontSize: 45,
+            alignItems: "flex-end",
+            color: '#fff',
+            fontWeight: 'bold',
+        },
+        column: {
+            flex: 1,
+            flexDirection: 'column',
+            justifyContent: 'flex-start',
+        }
+    },
+
+
 })
+
 
 
